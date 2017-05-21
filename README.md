@@ -37,11 +37,24 @@ Let us see how you can, step by step, set up your environment and run this app a
 12. Run "php composer.phar require google/auth" -> this installs the auth library needed to authenticate against the Google Cloud
 13. Run "php composer.phar require google/cloud" -> this installs the general GCP cloud library needed to access datastore
 14. If you list the contents of /var/www/html now, you will see a vendor directory created with an autoload.php file in it. if you are wondering what is PHP auto-loading, read this: http://ditio.net/2008/11/13/php-autoload-best-practices/
-Change the PHP code to point at *your* project instead of mine:
+15. Change the PHP code to point at *your* project instead of mine:
   * In loaddatastore.php, change the line "$projectId = 'triple-cab-162115';" - update the value to the project id to whatever your Google Cloud Project id is (the cloud console is a good place to grab this from)
   * Same for calldatastore.php
-15. 
 
-### Get the code and run it
+### Load test data into Cloud Datastore
 
-<TODO>
+1. Obviously, you have to do this once. I have used the publicly available BestBuy dataset here: https://github.com/BestBuyAPIs/open-data-set. In fact, the only file I have used from this dataset is products.json, and I have included that file in my repository, so you have it copied inside your /var/www/html folder right now
+2. You will have to run this command to load the data into Cloud datastore, the script and the file are already in /var/www/html by now, just run this command from that directory: "./loaddatastore.sh products.json". Before you attempt this, here is something you should know:
+  * There are almost 52K records in products.json. This command will take around 5 hours to complete
+  * The script that loads it (both the sh file and the php file that it calls repeatedly for each line) is **poorly optimized**. It is horrible to be precise. It just connects to datastore for every line on the JSON file, and runs a tight loop writing the entities into Datastore. I have used sed to extract the SKU and the Product Name fields only, that is all I write. The intent is to demo auto-complete on the Product name, hence
+  * Run this command and take a break, it will take a while
+
+### Demo auto-complete!
+
+After loading is complete, go back to the form.html on the browser, and start typing something in the text box, see what happens! If everything was successful, it should auto-complete.
+
+Feeling sluggish? No wonder! Performance optimization is **very poor** in this demo as of now
+1. As you type, every key-press results in a call to datastore, but instead of connection-pooling, the code creates a new connection every time. That is not good, especially if you care about the end user's experience for auto-complete
+2. The solution does not use any cache. As this is an overwhelmingly a read-heavy operation, we should use a service like memcache from GCP, so that it does not have to make a round-trip to datastore every time you type the same letter or sequence of letters
+3. GQL queries used against datastore are case-sensitive. That is why I use strtolower(...) in the file loaddatastore.php. That means all those 52K records are stored in datastore in lowercase. So if there is a product called "Battery", it will match if you start typing "battery". However, it will *not* match if you start typing "Battery". This is a known deficiency at this point. It is easy to fix this, I will leave this to others.
+  * Hint: Please do not try to run multiple queries for each key press, one each with every upper-case/ lower-case combination. That will totally kill it. Try something creative. Remember that for datastore, storage is cheap as dirt - its pricing model is proportional to number of reads made against the service. Why not load the data twice, once with strtolower(), and once without? if that seems abominable to your programmer's instincts, then please feel free to solve it the *super-right* way!
