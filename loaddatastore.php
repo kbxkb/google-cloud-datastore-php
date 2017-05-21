@@ -11,11 +11,11 @@ try
 	    'projectId' => $projectId
 	]);
 
-	if (sizeof($argv) <= 3) {
+	if (sizeof($argv) == 3) {
 		$transaction = $datastore->transaction();
 		$key = $datastore->key('SKU', $argv[1]);
 		$product = $datastore->entity( $key, [
-			'name' => $argv[2]
+			'name' => strtolower($argv[2])
 		]);
 		$datastore->upsert($product);
 		$transaction->commit();
