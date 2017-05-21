@@ -41,12 +41,51 @@ $datastore = new DatastoreClient([
     'projectId' => $projectId
 ]);
 
+/*
+$transaction = $datastore->transaction();
+$key = $datastore->key('SKU', '00001');
+$product = $datastore->entity( $key, [
+	'name' => 'koushik dummy 1'
+]);
+$datastore->upsert($product);
 
+$key = $datastore->key('SKU', '00002');
+$product = $datastore->entity( $key, [
+        'name' => 'koushik dummy 2'
+]);
+$datastore->upsert($product);
+$transaction->commit();
+*/
+
+/*
+$key = $datastore->key('SKU', '00001');
+$product = $datastore->lookup($key);
+echo $product['name'];
+*/
+
+echo 'Matches:<br/>';
+$queryval = $_GET['searchtext'];
+if ($queryval[0]) {
+	$upperlimit = $queryval . json_decode('"\ufffd"');
+	$query = $datastore->query()
+		->kind('SKU')
+		->filter('name', '>=', $queryval)
+		->filter('name', '<', $upperlimit)
+		->order('name');
+	$result = $datastore->runQuery($query);
+	foreach ($result as $SKU) {
+		echo $SKU['name'];
+		echo '<br/>';
+	}
+}
+
+
+/*
 date_default_timezone_set('UTC');
 $timenow = date('l jS \of F Y h:i:s A');
 $queryval = $_GET['searchtext'] . ' ' . $timenow;
 echo $queryval;
-
+*/
 
 
 
