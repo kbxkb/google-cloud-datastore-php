@@ -1,6 +1,6 @@
 # A PHP web application implementing autocomplete using google cloud datastore 
 
-This is a *quick and dirty* PHP web application that accesses google cloud datastore. The intent of this code is to demonstrate the technique only. This code, purposefully, in order to save time and effort, does not adhere to even minimum security standards (e.g., in order to quickly run the PHP code, it asks you to "chmod 777 /var/www/html" - it is your responsibility to understand the gravity of this and remove the VM as soon as you are done running the demo (or tighten things up yourself). Similarly, the code does not handle errors, does not log, and uses poor performance optimization (e.g., it does not connection-pool the datastore connection, instead it connects to Datastore every time a key is pressed)
+This is a *quick and dirty* PHP web application that accesses google cloud datastore. The intent of this code is to demonstrate the technique only. This code, purposefully, in order to save time and effort, does not adhere to even minimum security standards (e.g., in order to quickly run the PHP code, it asks you to "chmod 777 /var/www/html" - it is your responsibility to understand the gravity of this and remove the VM as soon as you are done running the demo (or tighten things up yourself). Similarly, the code does not handle errors, does not log, and uses poor performance optimization (e.g., it does not connection-pool the datastore connection, instead it connects to Datastore every time a key is pressed).
 
 ## How to run and test this app
 
@@ -23,7 +23,14 @@ Let us see how you can, step by step, set up your environment and run this app a
 
 1. Log in (use your SSH key if needed)
 2. Run "sudo apt-get update", and then "sudo apt-get install apache2 php5"
-3. 
+3. Test if apache is working - browse to the external IP address of the VM from your favorite browser
+4. Run "sudo apt-get install git", you will need to clone this repo
+5. Run "https://github.com/kbxkb/google-cloud-datastore-php.git" from anywhere meaningful, cd into google-cloud-datastore-php
+6. Run "sudo chmod -R 777 /var/www" - see the security warning in the initial paragraph of this README
+7. Copy calldatastore.php, form.html, loaddatastore.php, loaddatastore.sh, products.json into /var/www/html, use sudo as needed
+8. Test access - browse to {your IP address}/form.html - you are seeing the rudimentary front end of my PHP application. Go ahead and type something in the textbox, the output area will show error, as it will try to access Datastore, but we have not set it up yet
+9. Now, you need to add an environment variable to this VM. A good, permamnent way to do this is to edit /etc/environment and add a line to it. The line should be (without the quotes): "GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json" (remember you downloaded this file in the step 2 of the previous section?). If the path has spaces, put the value of the variable (i.e., the path) in double quotes. Once you save this file, you will have to log back out and in for it to take effect
+10. 
 
 ### Get the code and run it
 
