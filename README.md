@@ -1,6 +1,6 @@
 # A PHP web application implementing autocomplete using google cloud datastore 
 
-This is a quick and dirty PHP web application that accesses google cloud datastore. The intent of this code is to demonstrate the technique only. This code, purposefully, in order to save time and effort, does not adhere to even minimum security standards (e.g., in order to quickly run the PHP code, it asks you to "chmod 777 /var/www/html" - it is your responsibility to understand the gravity of this and remove the VM as soon as you are done running the demo (or tighten things up yourself). Similarly, the code does not handle errors, does not log, and uses poor performance optimization (e.g., it does not connection-pool the datastore connection, instead it connects to Datastore every time a key is pressed)
+This is a *quick and dirty* PHP web application that accesses google cloud datastore. The intent of this code is to demonstrate the technique only. This code, purposefully, in order to save time and effort, does not adhere to even minimum security standards (e.g., in order to quickly run the PHP code, it asks you to "chmod 777 /var/www/html" - it is your responsibility to understand the gravity of this and remove the VM as soon as you are done running the demo (or tighten things up yourself). Similarly, the code does not handle errors, does not log, and uses poor performance optimization (e.g., it does not connection-pool the datastore connection, instead it connects to Datastore every time a key is pressed)
 
 ## How to run and test this app
 
