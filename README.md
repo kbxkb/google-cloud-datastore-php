@@ -63,11 +63,10 @@ You might notice that the first time you type in a letter, it takes a little whi
 
 Still feeling a sluggish? No wonder! Though we have used caching, performance optimization is still **quite poor** in this demo as of now. As you type, every key-press results in a call to datastore, but instead of connection-pooling, the code creates a new connection every time. That is not good, especially if you care about the end user's experience for auto-complete
 
-### The case conundrum
+### A small case in point
 
-GQL queries used against datastore are case-sensitive. That is why I use strtolower(...) in the file loaddatastore.php. That means all those 52K records are stored in datastore in lowercase. So if there is a product called "Battery", it will match if you start typing "battery". However, it will *not* match if you start typing "Battery". This is a known deficiency at this point. It is easy to fix this, I will leave this to others.
-  * Hint: Please do not try to run multiple queries for each key press, one each with every upper-case/ lower-case combination. That will totally kill it. Try something creative. Remember that for datastore, storage is cheap as dirt - its pricing model is proportional to number of reads made against the service. Why not load the data twice, once with strtolower(), and once without? if that seems abominable to your programmer's instincts, then please feel free to solve it the *super-right* way!
-  
+GQL queries used against datastore are case-sensitive. That is why I use strtolower(...) in the file loaddatastore.php. That means all those 52K records are stored in datastore in lowercase. So if there is a product called "Battery", it will match if you start typing "battery". However, it will *not* match if you start typing "Battery" unless we convert everything you type to lowercase before issuing the query.
+
   ### Clean-up
   
 Do not forget to stop the VM, remove the GAE App and clean up Datastore. This is a metered platform, treat it like your own electricity bill, even if you are using an account with credits!
