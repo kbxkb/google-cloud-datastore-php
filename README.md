@@ -24,7 +24,10 @@ Let us see how you can, step by step, set up your environment and run this app a
 ### On the VM you created
 
 1. Log in (use your SSH key if needed)
-2. Run "sudo apt-get update", and then "sudo apt-get install apache2 php5"
+2. Run "sudo apt-get update", and then "sudo apt-get install apache2 php5 php5-memcached memcached"
+
+Note: We are installing memcached and php 5's memcache extension so that we can use memcache for RAM-based caching
+
 3. Test if apache is working - browse to the external IP address of the VM from your favorite browser
 4. Run "sudo apt-get install git", you will need to clone this repo
 5. Run "git clone https://github.com/kbxkb/google-cloud-datastore-php.git" from anywhere meaningful, cd into google-cloud-datastore-php
@@ -54,10 +57,15 @@ Let us see how you can, step by step, set up your environment and run this app a
 
 After loading is complete, go back to the form.html on the browser, and start typing something in the text box, see what happens! If everything was successful, it should auto-complete.
 
-Feeling sluggish? No wonder! Performance optimization is **very poor** in this demo as of now
-1. As you type, every key-press results in a call to datastore, but instead of connection-pooling, the code creates a new connection every time. That is not good, especially if you care about the end user's experience for auto-complete
-2. The solution does not use any cache. As this is an overwhelmingly read-heavy operation, we should use a service like memcache from GCP, so that it does not have to make a round-trip to datastore every time you type the same letter or sequence of letters
-3. GQL queries used against datastore are case-sensitive. That is why I use strtolower(...) in the file loaddatastore.php. That means all those 52K records are stored in datastore in lowercase. So if there is a product called "Battery", it will match if you start typing "battery". However, it will *not* match if you start typing "Battery". This is a known deficiency at this point. It is easy to fix this, I will leave this to others.
+### Caching is working!
+
+You might notice that the first time you type in a letter, it takes a little while to show the results. But if you type the same sequence of letters again, the results show up a lot quicker. This is because we are using memcache to cache the results for every unique letter-sequence in the code
+
+Still feeling a sluggish? No wonder! Though we have used caching, performance optimization is still **quite poor** in this demo as of now. As you type, every key-press results in a call to datastore, but instead of connection-pooling, the code creates a new connection every time. That is not good, especially if you care about the end user's experience for auto-complete
+
+### The case conundrum
+
+GQL queries used against datastore are case-sensitive. That is why I use strtolower(...) in the file loaddatastore.php. That means all those 52K records are stored in datastore in lowercase. So if there is a product called "Battery", it will match if you start typing "battery". However, it will *not* match if you start typing "Battery". This is a known deficiency at this point. It is easy to fix this, I will leave this to others.
   * Hint: Please do not try to run multiple queries for each key press, one each with every upper-case/ lower-case combination. That will totally kill it. Try something creative. Remember that for datastore, storage is cheap as dirt - its pricing model is proportional to number of reads made against the service. Why not load the data twice, once with strtolower(), and once without? if that seems abominable to your programmer's instincts, then please feel free to solve it the *super-right* way!
   
   ### Clean-up
