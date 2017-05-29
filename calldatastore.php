@@ -17,7 +17,7 @@ try
 	$matches_string = "";
 
 	//Get the string typed in by user for autocompletion...
-	$queryval = $_GET['searchtext'];
+	$queryval = strtolower($_GET['searchtext']);
 
 	//If it is not blank...
 	if ($queryval[0]) {
@@ -43,8 +43,8 @@ try
 			}
 
 			//finally, let us insert this query result in our local cache so that next time,
-			//we do not have to make a round-trip to datastore - note that we are caching for 1 day
-			$mem->set($queryval, $matches_string, 86400);
+			//we do not have to make a round-trip to datastore - note that we are caching for 7 days
+			$mem->set($queryval, $matches_string, 604800);
 		}
 		echo $matches_string;
 	}
